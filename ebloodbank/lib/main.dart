@@ -1,9 +1,8 @@
 
-import 'package:ebloodbank/map.dart';
 import 'package:flutter/material.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:location/location.dart';
-
+import 'package:ebloodbank/map.dart';
 
 void main() {
   runApp(MyApp());
@@ -35,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
+        // height: double.infinity,
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
@@ -43,7 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
               textColor: Colors.white,
               color: Colors.red,
               onPressed:(){
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>Sanam()));
+                // Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (_)=>Sanam()),(route)=>false);
+                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>MapSample()));
             }),
             
           ],

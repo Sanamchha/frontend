@@ -1,44 +1,68 @@
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
 import 'package:location/location.dart';
 
-class Sanam extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+class MapSample extends StatefulWidget {
   @override
-  _SanamState createState() => _SanamState();
+  State<MapSample> createState() => MapSampleState();
 }
 
-class _SanamState extends State<Sanam> {
-  LatLng _initialcameraposition = LatLng(27.664337, 85.423231);
-  GoogleMapController _controller;
+class MapSampleState extends State<MapSample> {
+  Completer<GoogleMapController> _controller = Completer();
   Location _location = Location();
+  LatLng userPosition;
 
-  void _onMapCreated(GoogleMapController _cntlr)
+  static final CameraPosition home = CameraPosition(
+    target: LatLng(27.6643, 85.4232),
+    zoom: 60,
+  );
+
+  void _onMapCreated(GoogleMapController controller)
   {
-    _controller = _cntlr;
-    _location.onLocationChanged.listen((l) { 
-        _controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(l.latitude, l.longitude),zoom: 15),
-          ),
-      );
+    _controller.complete(controller);
+    _location.onLocationChanged.listen((LocationData position) {
+      setState(() {
+          userPosition = LatLng(position.latitude, position.longitude);
+        });
+        _positionupdate();
     });
+    
   }
-
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar (
-        title: Text("Sanam Map"),
+    return new Scaffold(
+      body: GoogleMap(
+        compassEnabled: true,
+        mapType: MapType.normal,
+        myLocationEnabled: true,
+        scrollGesturesEnabled: true,
+        zoomGesturesEnabled: true,
+        initialCameraPosition: home,
+        // onCameraIdle: _positionupdate,
+        onMapCreated: _onMapCreated,
       ),
-        body: Container(
-        child: 
-        GoogleMap(
-                    initialCameraPosition: CameraPosition(target: _initialcameraposition),
-                    mapType: MapType.normal,
-                    onMapCreated: _onMapCreated,
-                    myLocationEnabled: true,
-                  ),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: _goToTheLake,
+      //   label: Text('To the lake!'),
+      //   icon: Icon(Icons.directions_boat),
+      // ),
+    );
+  }
+
+  Future<void> _positionupdate() async {
+    final GoogleMapController controller = await _controller.future;
+    CameraPosition address;
+    if (userPosition == null){
+      address = home;
+    }
+    else{
+      address = CameraPosition(target: userPosition, zoom: 14.4746);
+    }
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(address)
     );
   }
 }
